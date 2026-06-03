@@ -4,7 +4,7 @@
 #include "defs.h"
 #include "inode.h"
 
-struct vfs_inode *filesystem;
+struct vfs_inode *filesystem = NULL;
 
 uint16_t findFreeInode() {
     for (int i = 0; i < NUM_INODES; i++) {

@@ -1,6 +1,9 @@
 #pragma once
 
-#define NUM_INODES 256
+#define NUM_INODES 64
+
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
 
 typedef enum {
     VFS_SUCCESS,

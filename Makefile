@@ -1,8 +1,8 @@
 vfs: main filesystem
-	gcc -o vfs main.o filesystem.o
+	gcc -g -o vfs main.o filesystem.o -lSDL2main -lSDL2 
 
 main:
-	gcc -c main.c -o main.o
+	gcc -g -c main.c -o main.o
 
 filesystem:
-	gcc -c filesystem.c -o filesystem.o
+	gcc -g -c filesystem.c -o filesystem.o
