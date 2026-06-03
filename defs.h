@@ -1,0 +1,12 @@
+#pragma once
+
+#define NUM_INODES 256
+
+typedef enum {
+    VFS_SUCCESS,
+    VFS_ERR_INODE_EXISTS,
+    VFS_ERR_INODE_DOESNT_EXIST,
+    VFS_ERR_INODE_INVALID,
+    VFS_ERR_PARENT_INVALID,
+    VFS_ERR_NO_FREE_INODES
+} vfs_ret_t;
