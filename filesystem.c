@@ -30,7 +30,7 @@ vfs_ret_t initialiseSuper() {
     return initialiseBranch(0);
 }
 
-vfs_ret_t createFolder(int parentIdx, char *name, uint16_t *idx) {
+vfs_ret_t createFolder(int parentIdx, const char *name, uint16_t *idx) {
     if (parentIdx >= NUM_INODES) return VFS_ERR_INODE_INVALID;
     struct vfs_inode *parent = &filesystem[parentIdx];
 
