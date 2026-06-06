@@ -90,6 +90,8 @@ void drawTextWrap(SDL_Surface *surface, uint16_t x, uint16_t y, int wrapChars, c
 }
 
 void render() {
+    static char buf[32];
+
     SDL_SetRenderDrawColor(ctx, 255, 255, 255, 255);
     SDL_RenderClear(ctx);
 
@@ -102,7 +104,10 @@ void render() {
     SDL_Surface *descriptorText = SDL_CreateRGBSurface(0, 640, 480, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 
     for (int idx = 0; idx < NUM_INODES; idx++) {
-        struct vfs_inode *inode = &filesystem[idx];
+        sprintf(buf, "%u", idx);
+        drawText(descriptorText, 80 * (idx % 8) + 1, 60 * (idx / 8) + 1, buf);
+        struct vfs_inode *inode;
+        getInode(idx, &inode);
         SDL_Rect rect = {
             .x = 80 * (idx % 8) + 1,
             .y = 60 * (idx / 8) + 1,
@@ -110,17 +115,21 @@ void render() {
             .h = 59
         };
         if  (inode->type == INODE_BRANCH) {
+            sprintf(buf, "Parent: %d", idx);
             SDL_SetRenderDrawColor(ctx, 0xe1, 0xb8, 0x42, 255);
             SDL_RenderFillRect(ctx, &rect);
             for (int i = 0; i < inode->size; i++) {
                 struct vfs_branch_descriptor *desc = &inode->data.descData[i];
-                drawTextWrap(descriptorText, 80 * (desc->idx % 8) + 1, 60 * (desc->idx / 8) + 1, 11, desc->name);
+                drawTextWrap(descriptorText, 80 * (desc->idx % 8) + 1, 60 * (desc->idx / 8) + 11, 11, desc->name);
+                drawText(descriptorText, 80 * (desc->idx % 8) + 1, 60 * (desc->idx / 8) + 31, buf);
             }
         }
     }
 
     SDL_Surface *surface = SDL_GetWindowSurface(window);
     SDL_BlitSurface(descriptorText, NULL, surface, NULL);
+
+    SDL_FreeSurface(descriptorText);
 
     SDL_RenderPresent(ctx);
     SDL_UpdateWindowSurface(window);

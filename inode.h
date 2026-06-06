@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "defs.h"
+
 // 8 byte overhead for the other inode stuff (type, size, next inode index)
 #define INODE_DATA_BYTES 4088
 #define INODE_SUPER_IDX 0
@@ -15,7 +17,7 @@ enum vfs_inode_type {
 
 struct vfs_branch_descriptor {
     enum vfs_inode_type type;
-    char name[32];
+    char name[MAX_NAME_LENGTH];
     uint16_t idx;
 };
 
