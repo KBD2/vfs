@@ -1,11 +1,9 @@
-vfs: main filesystem gui
-	gcc -o vfs main.o filesystem.o gui.o -lSDL2main -lSDL2 -lSDL2_image
+objects = main.o filesystem.o gui.o errors.o
 
-main:
-	gcc -c main.c -o main.o
+vfs: $(objects)
+	gcc -o vfs $(objects) -lSDL2main -lSDL2 -lSDL2_image
 
-filesystem:
-	gcc -c filesystem.c -o filesystem.o
+.PHONY: clean
 
-gui:
-	gcc -c gui.c -o gui.o
+clean:
+	rm vfs $(objects)

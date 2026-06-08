@@ -11,6 +11,19 @@ typedef enum {
     VFS_ERROR
 } vfs_ret_t;
 
-vfs_ret_t error(const char *message);
+typedef enum {
+    VFS_ERR_INODE_EXISTS,
+    VFS_ERR_INODE_DOESNT_EXIST,
+    VFS_ERR_INODE_INVALID,
+    VFS_ERR_PARENT_INVALID,
+    VFS_ERR_NO_FREE_INODES,
+    VFS_ERR_CANT_ALLOCATE,
+    VFS_ERR_INVALID_PATH_CHAR,
+    VFS_ERR_INVALID_NAME,
+    VFS_ERR_NOT_FOUND,
+    VFS_ERR_NAME_ALREADY_EXISTS,
+} vfs_error_t;
+
+vfs_ret_t error(vfs_error_t error);
 
 const char *getLastError();

@@ -5,19 +5,7 @@
 
 #include "filesystem.h"
 #include "defs.h"
-#include "errors.h"
 #include "inode.h"
-
-const char *lastError = "";
-
-vfs_ret_t error(const char *message) {
-    lastError = message;
-    return VFS_ERROR;
-}
-
-const char *getLastError() {
-    return lastError;
-}
 
 struct vfs_inode *filesystem = NULL;
 char *nameBuf = NULL;
@@ -57,14 +45,27 @@ uint16_t findFreeInode() {
 
 vfs_ret_t initialiseBranch(uint16_t idx) {
     if (idx >= NUM_INODES) return error(VFS_ERR_INODE_INVALID);
-    struct vfs_inode *branch = &filesystem[idx];
-    if (branch->type != INODE_EMPTY) {
+    struct vfs_inode *inode = &filesystem[idx];
+    if (inode->type != INODE_EMPTY) {
         return error(VFS_ERR_INODE_EXISTS);
     }
-    branch->type = INODE_BRANCH;
-    branch->next = INODE_END_IDX;
-    branch->size = 0;
-    memset(branch->data.descData, 0, INODE_DATA_BYTES);
+    inode->type = INODE_BRANCH;
+    inode->next = INODE_END_IDX;
+    inode->size = 0;
+    memset(inode->data.byteData, 0, INODE_DATA_BYTES);
+    return VFS_SUCCESS;
+}
+
+vfs_ret_t initialiseFile(uint16_t idx) {
+    if (idx >= NUM_INODES) return error(VFS_ERR_INODE_INVALID);
+    struct vfs_inode *inode = &filesystem[idx];
+    if (inode->type != INODE_EMPTY) {
+        return error(VFS_ERR_INODE_EXISTS);
+    }
+    inode->type = INODE_FILE;
+    inode->next = INODE_END_IDX;
+    inode->size = 0;
+    memset(inode->data.byteData, 0, INODE_DATA_BYTES);
     return VFS_SUCCESS;
 }
 
