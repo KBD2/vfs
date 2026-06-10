@@ -1,7 +1,8 @@
 #pragma once
 
 #define NUM_INODES 64
-#define MAX_NAME_LENGTH 32
+#define MAX_NAME_LENGTH 31
+#define PATH_NODE_BUF_SIZE 100
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480

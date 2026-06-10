@@ -19,8 +19,6 @@ int main() {
 
     if (handleReturn(initFilesystem())) return 0;
 
-    if (handleReturn(initialiseSuper())) return 0;
-
     if (handleReturn(createFolder("One"))) return 0;
 
     if (handleReturn(createFolder("Two")))  return 0;
