@@ -23,6 +23,7 @@ typedef enum {
     VFS_ERR_INVALID_NAME,
     VFS_ERR_NOT_FOUND,
     VFS_ERR_NAME_ALREADY_EXISTS,
+    VFS_ERR_INODE_TYPE_INVALID
 } vfs_error_t;
 
 vfs_ret_t error(vfs_error_t error);

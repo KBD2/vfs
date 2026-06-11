@@ -116,13 +116,16 @@ void render() {
         };
         if  (inode->type == INODE_BRANCH) {
             sprintf(buf, "Parent: %d", idx);
-            SDL_SetRenderDrawColor(ctx, 0xe1, 0xb8, 0x42, 255);
+            SDL_SetRenderDrawColor(ctx, 0xe1, 0xb8, 0x42, 0xff);
             SDL_RenderFillRect(ctx, &rect);
             for (int i = 0; i < inode->size; i++) {
                 struct vfs_branch_descriptor *desc = &inode->data.descData[i];
                 drawTextWrap(descriptorText, 80 * (desc->idx % 8) + 1, 60 * (desc->idx / 8) + 11, 11, desc->name);
                 drawText(descriptorText, 80 * (desc->idx % 8) + 1, 60 * (desc->idx / 8) + 31, buf);
             }
+        } else if (inode->type == INODE_FILE) {
+            SDL_SetRenderDrawColor(ctx, 0xae, 0xd5, 0xf5, 0xff);
+            SDL_RenderFillRect(ctx, &rect);
         }
     }
 

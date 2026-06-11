@@ -34,6 +34,8 @@ vfs_ret_t error(vfs_error_t error) {
         case VFS_ERR_NAME_ALREADY_EXISTS:
             lastError = "Path already exists";
             break;
+        case VFS_ERR_INODE_TYPE_INVALID:
+            lastError = "Invalid inode type";
         default:
             lastError = "Unknown error";
     }

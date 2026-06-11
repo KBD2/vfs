@@ -24,6 +24,10 @@ int main() {
     if (handleReturn(createFolder("Two")))  return 0;
     if (handleReturn(createFolder("Two/Three")))  return 0;
 
+    if (handleReturn(createFile("Two/Three/test.txt"))) return 0;
+
+    if (handleReturn(createFolder("One/Four")))  return 0;
+
     if (initGui()) return 1;
 
     while (updateGui() == GUI_CONTINUE) {}

@@ -28,9 +28,10 @@ void freePathParts() {
 
 vfs_ret_t addPathPart(const char *name) {
     struct path_part *part = malloc(sizeof(struct path_part));
-    if (part == NULL) return VFS_ERR_CANT_ALLOCATE;
+    if (part == NULL) return error(VFS_ERR_CANT_ALLOCATE);
     strncpy(part->name, name, MAX_NAME_LENGTH);
     part->name[MAX_NAME_LENGTH] = '\0';
+    part->next = NULL;
     if (pathParts == NULL) {
         pathParts = part;
     } else {
@@ -76,34 +77,12 @@ uint16_t findFreeInode() {
     return 0;
 }
 
-vfs_ret_t initialiseBranch(uint16_t idx) {
-    if (idx >= NUM_INODES) return error(VFS_ERR_INODE_INVALID);
-    struct vfs_inode *inode = &filesystem[idx];
-    if (inode->type != INODE_EMPTY) {
-        return error(VFS_ERR_INODE_EXISTS);
-    }
-    inode->type = INODE_BRANCH;
-    inode->next = INODE_END_IDX;
-    inode->size = 0;
-    memset(inode->data.byteData, 0, INODE_DATA_BYTES);
-    return VFS_SUCCESS;
-}
-
-vfs_ret_t initialiseFile(uint16_t idx) {
-    if (idx >= NUM_INODES) return error(VFS_ERR_INODE_INVALID);
-    struct vfs_inode *inode = &filesystem[idx];
-    if (inode->type != INODE_EMPTY) {
-        return error(VFS_ERR_INODE_EXISTS);
-    }
-    inode->type = INODE_FILE;
-    inode->next = INODE_END_IDX;
-    inode->size = 0;
-    memset(inode->data.byteData, 0, INODE_DATA_BYTES);
-    return VFS_SUCCESS;
-}
-
 vfs_ret_t initialiseSuper() {
-    return initialiseBranch(0);
+    struct vfs_inode *super = filesystem; // First inode in the filesystem, variable for clarity
+    super->type = INODE_BRANCH;
+    super->next = INODE_END_IDX;
+    super->size = 0;
+    memset(super->data.byteData, 0, INODE_DATA_BYTES);
 }
 
 bool validatePath(const char *path) {
@@ -157,7 +136,7 @@ vfs_ret_t splitPath(const char *path, int *length) {
     return VFS_SUCCESS;
 }
 
-vfs_ret_t createBranch(struct vfs_inode *parent, const char *name, uint16_t *idx) {
+vfs_ret_t allocateNode(struct vfs_inode *parent, enum vfs_inode_type type, const char *name, uint16_t *idx) {
     if (parent->type != INODE_BRANCH) return error(VFS_ERR_PARENT_INVALID);
 
     uint16_t freeInode = findFreeInode();
@@ -168,22 +147,26 @@ vfs_ret_t createBranch(struct vfs_inode *parent, const char *name, uint16_t *idx
     int assignedDescriptor = parent->size++;
 
     struct vfs_branch_descriptor *descriptor = &parent->data.descData[assignedDescriptor];
-    descriptor->idx = findFreeInode(),
-    descriptor->type = INODE_BRANCH;
+    descriptor->idx = freeInode,
+    descriptor->type = type;
     strncpy(descriptor->name, name, 32);
     descriptor->name[31] = '\0';
 
-    initialiseBranch(freeInode);
-
-    memset(filesystem[freeInode].data.descData, 0, INODE_DATA_BYTES);
+    struct vfs_inode *inode = &filesystem[freeInode];
+    inode->type = type;
+    inode->next = INODE_END_IDX;
+    inode->size = 0;
+    memset(inode->data.byteData, 0, INODE_DATA_BYTES);
 
     if (idx != NULL) *idx = freeInode;
 
     return VFS_SUCCESS;
 }
 
-vfs_ret_t createFolder(const char *path) {
+vfs_ret_t createNodeFromPath(const char *path, enum vfs_inode_type type) {
     if (!validatePath(path)) return error(VFS_ERR_INVALID_PATH_CHAR);
+
+    if (type != INODE_BRANCH && type != INODE_FILE) return error(VFS_ERR_INODE_TYPE_INVALID);
 
     int pathLength;
     if (splitPath(path, &pathLength) == VFS_ERROR) return VFS_ERROR;
@@ -202,7 +185,15 @@ vfs_ret_t createFolder(const char *path) {
 
     if (findDescriptor(part->name, currentBranch) != NULL) return error(VFS_ERR_NAME_ALREADY_EXISTS);
 
-    return createBranch(currentBranch, part->name, NULL);
+    return allocateNode(currentBranch, type, part->name, NULL);
+}
+
+inline vfs_ret_t createFolder(const char *path) {
+    return createNodeFromPath(path, INODE_BRANCH);
+}
+
+inline vfs_ret_t createFile(const char *path) {
+    return createNodeFromPath(path, INODE_FILE);
 }
 
 vfs_ret_t initFilesystem() {
